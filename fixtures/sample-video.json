@@ -1,0 +1,20 @@
+{
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "geminiUnderstanding": {
+    "title": "How Claude Code Works: The Unreasonable Effectiveness of Plain Text",
+    "summary": "A walkthrough of how an agentic coding CLI plans, edits, and verifies changes, and why plain-text tool output beats heavy schemas for agent control.",
+    "topics": ["agentic coding", "tool design", "CLI ergonomics", "plain-text output"],
+    "estimatedWatchMinutes": 14
+  },
+  "approvalMessage": "I found: How Claude Code Works: The Unreasonable Effectiveness of Plain Text. Tapback thumbs-up to save it to Notion.",
+  "tapbackInbound": {
+    "service": "iMessage",
+    "is_outbound": false,
+    "from_number": "+15555550199",
+    "content": "Liked “I found: How Claude Code Works: The Unreasonable Effectiveness of Plain Text. Tapback thumbs-up to save it to Notion.”"
+  },
+  "notionPage": {
+    "pageUrl": "https://www.notion.so/Example-Technical-Reading-row-0000000000000000000000000000",
+    "properties": { "Status": "Not started", "Expected Reading Time": 14 }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "omni-presence-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent skills and CLI primitives for the omni-presence demo. codex/claude code is the control agent.",
+  "bin": {
+    "call-fred": "bin/call-fred.ts",
+    "sendblue-api": "bin/sendblue-api.ts",
+    "understand-video": "bin/understand-video.ts",
+    "save-technical-reading": "bin/save-technical-reading.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"test/*.test.ts\"",
+    "check": "npm run typecheck && npm run test",
+    "call-fred": "node bin/call-fred.ts",
+    "sendblue-api": "node bin/sendblue-api.ts",
+    "understand-video": "node bin/understand-video.ts",
+    "save-technical-reading": "node bin/save-technical-reading.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.48.0",
+    "@notionhq/client": "^5.0.0",
+    "alawmulaw": "^6.0.0",
+    "commander": "^14.0.0",
+    "dotenv": "^16.4.0",
+    "express": "^5.0.0",
+    "twilio": "^5.13.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}
