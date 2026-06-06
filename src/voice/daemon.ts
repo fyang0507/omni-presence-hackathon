@@ -277,8 +277,15 @@ export class CallDaemon {
       s.handoffSummary = String(args.summary ?? "");
       this.emit(s, "sms_handoff_detected", { summary: s.handoffSummary });
       s.gemini?.respondToTool(toolId, name, { acknowledged: true });
+    } else if (name === "end_call") {
+      // Fred explicitly asked to hang up (the prompt forbids ending on objective
+      // completion). Ack the tool, then drain any in-flight goodbye and hang up —
+      // same path as an operator `hangup`, so a spoken goodbye isn't clipped.
+      const reason = String(args.reason ?? "Fred asked to hang up");
+      this.emit(s, "end_call_requested", { reason });
+      s.gemini?.respondToTool(toolId, name, { ending: true });
+      this.requestHangup(s);
     }
-    // The agent has no end_call tool — only the operator ends the call (see requestHangup).
   }
 
   /**

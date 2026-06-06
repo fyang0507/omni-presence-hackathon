@@ -61,8 +61,12 @@ babysits a foreground process — it drives the daemon over HTTP:
 - `listen` → returns only events appended since the agent's last `listen` (incremental pointer
   per session), so the agent polls across turns. `--follow` streams NDJSON until `ended`.
 - `steer` / `status` / `hangup` address a session by id (defaulting to the active call).
-- `hangup` is **operator-only** — the agent has no `end_call` tool and never ends the call
-  itself. A live hangup is deferred behind a Twilio `mark` so a steered goodbye drains first.
+- The call ends two ways: the **voice agent** calls its `end_call` tool when Fred explicitly asks
+  to hang up (it never ends a call just because the objective is done), or the **operator** runs
+  `hangup`. Both routes funnel through the same drain path — the actual hangup is deferred behind
+  a Twilio `mark` echo so a just-spoken goodbye plays out before the line closes. Letting the voice
+  agent hang up on request matters because the control agent stops polling `listen` once it moves
+  to the SMS phase, so a spoken "hang up" would otherwise never reach it.
 - Runtime state (`pid`, `port`) lives in `logs/daemon.json`; `teardown` kills the daemon.
 
 This mirrors outreach-cli's `init`/`place`/`listen` lifecycle.

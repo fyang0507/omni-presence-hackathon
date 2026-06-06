@@ -17,8 +17,12 @@ export interface GeminiLiveOptions {
 }
 
 /**
- * Tools the agent can call. Only `note_sms_handoff` — the agent never hangs up
- * on its own; Fred decides when the call ends and the operator drives `hangup`.
+ * Tools the agent can call.
+ * - `note_sms_handoff`: flag that Fred is sending a YouTube link by SMS.
+ * - `end_call`: hang up the phone. The agent never ends the call on its own when
+ *   an objective is done — it calls this ONLY when Fred explicitly asks to hang up
+ *   (see the prompt). This keeps the call alive while the control agent moves on to
+ *   the SMS phase and stops polling the transcript.
  */
 const TOOLS: Tool[] = [
   {
@@ -37,6 +41,24 @@ const TOOLS: Tool[] = [
             },
           },
           required: ["summary"],
+        },
+      },
+      {
+        name: "end_call",
+        description:
+          "Hang up the phone. Call this ONLY when Fred explicitly asks to end the call " +
+          "(e.g. \"you can hang up now\", \"let's hang up\", \"that's all, bye\"). Never call it " +
+          "just because a task is finished — keep the line open until Fred clearly asks to end it. " +
+          "Say a brief spoken goodbye before calling this.",
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            reason: {
+              type: Type.STRING,
+              description: "One short line on why the call is ending (e.g. \"Fred asked to hang up\").",
+            },
+          },
+          required: ["reason"],
         },
       },
     ],

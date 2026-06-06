@@ -43,11 +43,14 @@ so poll it across turns:
 
 `--follow` streams events as NDJSON until the call ends (one blocking command instead of a poll
 loop). Event types: `call_placed`, `call_started`, `transcript` (`{who:"fred"|"agent", text}`),
-`steer_sent`, `sms_handoff_detected`, `twilio_status`, `call_ended`.
+`steer_sent`, `sms_handoff_detected`, `end_call_requested`, `twilio_status`, `call_ended`.
 
-The agent **never ends the call itself** — there is no `end_call` tool. The call stays live until
-the operator runs `hangup` (or Twilio reports the line dropped). So don't wait for `status:
-"ended"` to move on; act on `sms_handoff_detected` and hang up only when Fred asks.
+The agent **never ends the call just because the objective is done** — it keeps the line open by
+default. It hangs up only on Fred's explicit spoken request ("you can hang up now"), via its
+`end_call` tool → `end_call_requested` then `call_ended`. The operator can also end it directly
+with `hangup`. So don't wait for `status: "ended"` to move on; act on `sms_handoff_detected`. You
+don't have to keep polling once you're in the SMS phase — the voice agent can close the call on
+Fred's spoken request without you.
 
 ## Steering mid-call (nudge)
 

@@ -15,13 +15,34 @@ event log lands in `logs/demo-events.jsonl`.
 ## Preflight (silent, before you start)
 
 ```bash
-node bin/call-fred.ts init               # start the background voice daemon
+node bin/call-fred.ts init               # start the background voice daemon (port in logs/daemon.json)
 node bin/sendblue-api.ts preflight
 node bin/save-technical-reading.ts preflight
 ```
 
-If any fails, tell Fred what's missing in one sentence and stop. The Notion target already has its
-schema (Name / Status / Expected Reading Time) established — the demo assumes it's ready.
+**Tunnel — do this before placing the call.** Twilio reaches the daemon's media stream and status
+callbacks through the public tunnel in `TWILIO_WEBHOOK_BASE_URL` (a reserved ngrok domain). If the
+ngrok process isn't running, the domain answers nothing: the REST call still rings Fred's phone, but
+the moment he picks up, Twilio's `<Connect><Stream>` can't open the audio bridge, so the call drops
+immediately. Always confirm the tunnel is live, and restart it on the SAME reserved domain if it's down:
+
+```bash
+BASE=$(grep -E '^TWILIO_WEBHOOK_BASE_URL=' .env | cut -d= -f2-)   # e.g. https://<sub>.ngrok-free.dev
+# 1) Is the tunnel reachable from the outside (Twilio's view)?
+curl -s -o /dev/null -w '%{http_code}\n' "$BASE/health"          # want 200
+# 2) If not 200 (or `pgrep -fl ngrok` shows nothing), bring it back up on the SAME domain:
+ngrok http 8080 \
+  --domain="$(printf '%s' "$BASE" | sed -E 's#^https?://##; s#/.*$##')" \
+  --log=stdout > logs/ngrok.log 2>&1 &
+# 3) Re-check until `curl "$BASE/health"` returns 200 before placing the call.
+```
+
+The daemon's port (the `8080` in `ngrok http <port>`) is recorded in `logs/daemon.json`. The tunnel
+is live only when `"$BASE/health"` returns `200` — verify that, not just that a process exists.
+
+If any preflight step fails, tell Fred what's missing in one sentence and stop. The Notion target
+already has its schema (Name / Status / Expected Reading Time) established — the demo assumes it's
+ready.
 
 ## Step 1 — Call Fred (and steer)
 
@@ -48,10 +69,13 @@ node bin/call-fred.ts steer "Fred's sending the link by text — confirm you'll 
 You don't *have* to steer — Gemini also self-detects the handoff (`note_sms_handoff` tool →
 `sms_handoff_detected` event in the `listen` stream).
 
-**The agent never hangs up on its own.** Once you see `sms_handoff_detected` (or Fred clearly
-says he'll text the link), proceed to Step 2 — keep the call live in the background. Fred decides
-when to end it; you only run `hangup` when he tells you to (see Step 6). Keep `listen`-ing
-occasionally so you can react if Fred says something else.
+**The agent never hangs up just because the objective is done.** Once you see
+`sms_handoff_detected` (or Fred clearly says he'll text the link), proceed to Step 2 — keep the
+call live in the background while you work the SMS phase. The call ends one of two ways: Fred tells
+the *voice agent* on the phone to hang up (it calls `end_call` itself → `end_call_requested` then
+`call_ended` in the stream), or you run `hangup` from the control side (see Step 6). You don't have
+to keep polling `listen` during the SMS phase — the voice agent can close the call on Fred's spoken
+request without you.
 
 Fred's expected spoken line: *"I have a YouTube video I'm interested in but can't view right
 now. I'll text it to you."*
@@ -114,13 +138,25 @@ node bin/sendblue-api.ts send "Saved \"<title>\" to your Technical Reading in No
 
 Then tell Fred in chat: the title you saved and the Notion URL.
 
-The call is still live — the agent does not hang up on its own. **Leave it open until Fred tells
-you he's done** (e.g. "you can hang up now"). When he does, end the call and stop the daemon:
+The call may still be live. There are two ways it ends, and you should handle both:
+
+- **Fred tells the voice agent on the phone** (e.g. "you can hang up now") — the agent says a
+  quick goodbye and hangs up itself. You'll see `end_call_requested` → `call_ended` if you
+  `listen`/`status`. Nothing for you to do on the call side.
+- **You end it from the control side** — run `hangup` (it drains a spoken goodbye first):
 
 ```bash
 node bin/call-fred.ts hangup     # optionally `steer "say a quick goodbye"` first; hangup drains it
+```
+
+Either way, once the call has ended, stop the daemon:
+
+```bash
 node bin/call-fred.ts teardown
 ```
+
+The agent never hangs up just because the demo is finished — only on Fred's explicit spoken
+request or your `hangup`.
 
 ## Troubleshooting
 
@@ -131,9 +167,15 @@ node bin/call-fred.ts teardown
 - **Tapback delayed** — `wait-for-tapback` also accepts a `yes` reply as fallback.
 - **Notion write fails** — run `save-technical-reading preflight`; check `NOTION_API_KEY` and
   `TECHNICAL_READING_DATA_SOURCE_ID`.
-- **Twilio call won't connect** — confirm `TWILIO_FROM_NUMBER` is a Twilio-owned number
+- **Call rings, but hangs up the instant Fred picks up** — the ngrok tunnel is almost certainly
+  down. Tell: the dead call has **no `call_started` / `twilio_status` events** in
+  `logs/demo-events.jsonl` (Twilio couldn't reach the daemon for the media stream *or* status
+  callback). REST dialing still works without the tunnel, so the phone rings; the bridge only fails
+  on pickup. Fix: re-run the **Tunnel** preflight above (restart ngrok on the reserved domain, wait
+  for `"$BASE/health"` → 200), then `place` again. The daemon stays healthy — only the tunnel died.
+- **Twilio call won't connect at all** — confirm `TWILIO_FROM_NUMBER` is a Twilio-owned number
   *different* from `DEMO_USER_PHONE`, and that `TWILIO_WEBHOOK_BASE_URL` points at a live tunnel
-  to this machine.
+  to this machine (see the Tunnel preflight).
 - **`place`/`listen`/`steer` say "Cannot reach the call daemon"** — run `call-fred init` first;
   if it's wedged, `call-fred teardown` then `init` again.
 

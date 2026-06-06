@@ -18,6 +18,46 @@ export class UnsupportedVideoError extends Error {
   }
 }
 
+const YOUTUBE_HOSTS = new Set(["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"]);
+
+/**
+ * Gemini's YouTube URL preview path is sensitive to extra tracking params.
+ * Keep only the stable video identifier and supported path shape before calling it.
+ */
+export function normalizeYouTubeUrl(raw: string): string {
+  const trimmed = raw.trim().replace(/[),.;!?]+$/g, "");
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    throw new UnsupportedVideoError(`Invalid YouTube URL: ${raw}`);
+  }
+
+  const host = url.hostname.toLowerCase();
+  if (!YOUTUBE_HOSTS.has(host)) {
+    throw new UnsupportedVideoError(`Not a supported YouTube host: ${url.hostname}`);
+  }
+
+  if (host === "youtu.be") {
+    const id = url.pathname.split("/").filter(Boolean)[0];
+    if (!id) throw new UnsupportedVideoError(`YouTube short URL is missing a video id: ${raw}`);
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`;
+  }
+
+  if (url.pathname === "/watch") {
+    const id = url.searchParams.get("v");
+    if (!id) throw new UnsupportedVideoError(`YouTube watch URL is missing a video id: ${raw}`);
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`;
+  }
+
+  const pathParts = url.pathname.split("/").filter(Boolean);
+  if ((pathParts[0] === "shorts" || pathParts[0] === "live") && pathParts[1]) {
+    return `https://www.youtube.com/${pathParts[0]}/${encodeURIComponent(pathParts[1])}`;
+  }
+
+  throw new UnsupportedVideoError(`Unsupported YouTube URL shape: ${raw}`);
+}
+
 const PROMPT =
   "Watch this YouTube video and produce a concise reading/watch artifact. Return: a clear, " +
   "specific title (use the real video title if obvious), a 2-3 sentence summary, 3-6 key topics, " +
@@ -68,9 +108,10 @@ export interface UnderstandOptions {
 }
 
 export async function understandVideo(url: string, opts: UnderstandOptions): Promise<VideoArtifact> {
+  const videoUrl = normalizeYouTubeUrl(url);
   const generate =
     opts.generate ??
-    (async (videoUrl: string) => {
+    (async (canonicalUrl: string) => {
       const ai = new GoogleGenAI({ apiKey: opts.apiKey });
       try {
         const res = await ai.models.generateContent({
@@ -78,7 +119,7 @@ export async function understandVideo(url: string, opts: UnderstandOptions): Pro
           contents: [
             {
               role: "user",
-              parts: [{ fileData: { fileUri: videoUrl } }, { text: PROMPT }],
+              parts: [{ fileData: { fileUri: canonicalUrl } }, { text: PROMPT }],
             },
           ],
           config: { responseMimeType: "application/json", responseSchema: RESPONSE_SCHEMA },
@@ -86,12 +127,16 @@ export async function understandVideo(url: string, opts: UnderstandOptions): Pro
         return res.text ?? "";
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        if (/private|unlisted|not.*support|unavailable|forbidden|permission/i.test(msg)) {
+        if (
+          /private|unlisted|not.*support|unavailable|forbidden|permission|unsupported mime type|text\/html/i.test(
+            msg,
+          )
+        ) {
           throw new UnsupportedVideoError(`Gemini could not access this video: ${msg}`);
         }
         throw err;
       }
     });
-  const raw = await generate(url);
+  const raw = await generate(videoUrl);
   return parseModelJson(raw);
 }
