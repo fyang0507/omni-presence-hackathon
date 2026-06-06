@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omni-Presence — meet the user where they already are</title>
+  <meta name="description" content="No new interface. No new agent. A portable skill that lets any agent show up where you already are — a phone call, a text." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="ledger" aria-hidden="true"></div>
+
+  <!-- ===================== HERO ===================== -->
+  <header class="hero" id="top">
+    <nav class="nav">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="signal"></span>
+        </span>
+        <span class="brand-name">omni&#8203;<i>·</i>presence</span>
+      </a>
+      <div class="dateline">DISPATCH № 01 · BETAWORKS · 2026</div>
+      <div class="nav-links">
+        <a href="#demo">The Demo</a>
+        <a href="#stack">The Wiring</a>
+      </div>
+    </nav>
+
+    <div class="hero-inner">
+      <div class="eyebrow"><span class="eyebrow-rule"></span> a multimodal hackathon dispatch</div>
+
+      <h1 class="manifesto">
+        <span class="redline" style="--d:.15s">
+          <span class="strike">Build a new interface.</span>
+          <span class="revise"><span class="caret" aria-hidden="true">↳</span>Meet you in the one you <em>already</em> use.</span>
+        </span>
+        <span class="redline" style="--d:.45s">
+          <span class="strike">Build a new agent.</span>
+          <span class="revise"><span class="caret" aria-hidden="true">↳</span>Build the skill that lets <em>any</em> agent do the work.</span>
+        </span>
+      </h1>
+
+      <p class="takeaway">
+        <span class="takeaway-key">Omni-presence —</span>
+        meet the user where they are, with a skill any agent can run.
+      </p>
+
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#demo">Watch it happen <span aria-hidden="true">→</span></a>
+        <a class="btn btn-ghost" href="#stack">See the wiring</a>
+      </div>
+
+      <ul class="surfaces" aria-label="surfaces the agent shows up on">
+        <li class="surface"><span class="s-no">01</span> Phone call</li>
+        <li class="surface"><span class="s-no">02</span> iMessage</li>
+        <li class="surface"><span class="s-no">03</span> Video</li>
+        <li class="surface"><span class="s-no">04</span> Notion</li>
+      </ul>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true"><span>scroll</span><span class="sh-line"></span></div>
+  </header>
+
+  <!-- ===================== DEMO ===================== -->
+  <section class="demo" id="demo">
+    <div class="section-head">
+      <div class="kicker"><span class="kicker-no">§ 01</span> the demo</div>
+      <h2>One trigger. The agent works the channels you<br/> <em>already</em> live in.</h2>
+      <p class="lede">
+        Fred types <code>/demo</code> in his coding agent. It <b>calls his phone</b>, hears him say
+        “I'll text you a link,” <b>watches iMessage</b>, understands the video, asks for a 👍, and
+        <b>files it in Notion</b> — then texts the link back.
+      </p>
+    </div>
+
+    <div class="storyboard">
+      <ol class="sb-track" id="sbTrack">
+        <li class="sb-step" data-step="0">
+          <div class="sb-ico">📞</div>
+          <div class="sb-body">
+            <div class="sb-actor agent">agent → fred</div>
+            <h3>The call</h3>
+            <p>Agent dials Fred. <em>“Hey Fred — what's on your mind?”</em></p>
+          </div>
+        </li>
+        <li class="sb-step" data-step="1">
+          <div class="sb-ico">🗣️</div>
+          <div class="sb-body">
+            <div class="sb-actor fred">fred → agent</div>
+            <h3>The hand-off</h3>
+            <p><em>“Got a video to watch later — put it in my Notion. I'll text you the link.”</em></p>
+          </div>
+        </li>
+        <li class="sb-step" data-step="2">
+          <div class="sb-ico">💬</div>
+          <div class="sb-body">
+            <div class="sb-actor fred">fred → agent</div>
+            <h3>The text</h3>
+            <p>Fred drops a YouTube link in iMessage. The agent is already watching the channel.</p>
+          </div>
+        </li>
+        <li class="sb-step" data-step="3">
+          <div class="sb-ico">🎬</div>
+          <div class="sb-body">
+            <div class="sb-actor agent">agent</div>
+            <h3>Understand</h3>
+            <p>Gemini watches the video and drafts a title + summary. <em>“Got it — understanding now.”</em></p>
+          </div>
+        </li>
+        <li class="sb-step" data-step="4">
+          <div class="sb-ico">👍</div>
+          <div class="sb-body">
+            <div class="sb-actor agent">agent → fred</div>
+            <h3>Approve</h3>
+            <p><em>“I found a talk on multimodal agents. Tapback 👍 to save it.”</em> Fred taps thumbs-up.</p>
+          </div>
+        </li>
+        <li class="sb-step" data-step="5">
+          <div class="sb-ico">📓</div>
+          <div class="sb-body">
+            <div class="sb-actor agent">agent</div>
+            <h3>Filed</h3>
+            <p>Row created in Technical Reading. Agent texts back the Notion link. Done.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="sb-controls">
+        <button class="mini-btn" id="sbReplay">↺ Replay</button>
+        <div class="sb-progress"><span id="sbProgressFill"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STACK ===================== -->
+  <section class="stack" id="stack">
+    <div class="section-head">
+      <div class="kicker"><span class="kicker-no">§ 02</span> the wiring</div>
+      <h2>Boring, real plumbing — wrapped in a <em>portable</em> skill.</h2>
+      <p class="lede">
+        No bespoke runtime. The control agent is just <b>Cursor / Claude Code's default agent</b>.
+        The capability lives in a <b>skill</b> — so every agent can do the job.
+      </p>
+    </div>
+
+    <div class="stack-grid">
+      <article class="stack-card">
+        <div class="sc-no">01</div>
+        <div class="sc-ico">📞</div>
+        <h3>Phone</h3>
+        <p>Twilio Programmable Voice + Media Streams, bridged to <b>Gemini Live</b> for a real-time, two-way conversation.</p>
+        <div class="sc-tags"><span>Twilio</span><span>Gemini Live</span></div>
+      </article>
+      <article class="stack-card">
+        <div class="sc-no">02</div>
+        <div class="sc-ico">💬</div>
+        <h3>iMessage</h3>
+        <p><b>Sendblue</b> sends + reads iMessage, including the 👍 tapback as the human-in-the-loop gate.</p>
+        <div class="sc-tags"><span>Sendblue</span><span>tapback</span></div>
+      </article>
+      <article class="stack-card">
+        <div class="sc-no">03</div>
+        <div class="sc-ico">🎬</div>
+        <h3>Understanding</h3>
+        <p><b>Gemini</b> video understanding turns a public YouTube URL into a title + summary, no download.</p>
+        <div class="sc-tags"><span>Gemini</span><span>YouTube</span></div>
+      </article>
+      <article class="stack-card">
+        <div class="sc-no">04</div>
+        <div class="sc-ico">📓</div>
+        <h3>Artifact</h3>
+        <p>The reading lands in <b>Notion</b> as a Technical Reading row — the durable result.</p>
+        <div class="sc-tags"><span>Notion</span></div>
+      </article>
+    </div>
+
+    <div class="portable">
+      <div class="portable-line">
+        <span class="chip">Claude Code</span>
+        <span class="chip">Cursor</span>
+        <span class="chip">Codex</span>
+        <span class="portable-arrow">→</span>
+        <span class="chip chip-skill">the same skill</span>
+        <span class="portable-arrow">→</span>
+        <span class="chip chip-result">the same result</span>
+      </div>
+      <p class="portable-note">
+        The agent isn't the product. The <b>enablement</b> is. Drop the skill into any general agent
+        and it shows up on your phone, in your texts, across your tools — <em>omni-presence.</em>
+      </p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-rule"></div>
+    <div class="footer-row">
+      <span>omni-presence · betaworks multimodal hackathon · 2026</span>
+      <a href="#top">back to top ↑</a>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
