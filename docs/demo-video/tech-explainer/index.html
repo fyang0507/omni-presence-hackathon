@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-300.ttf") format("truetype");
+        font-weight: 300;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-400.ttf") format("truetype");
+        font-weight: 400;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-500.ttf") format("truetype");
+        font-weight: 500;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-700.ttf") format("truetype");
+        font-weight: 700 900;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("fonts/ibm-plex-mono-600.ttf") format("truetype");
+        font-weight: 600;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("fonts/ibm-plex-mono-700.ttf") format("truetype");
+        font-weight: 700;
+      }
+
+      :root {
+        --bg: #080b10;
+        --panel: #10141c;
+        --panel-2: #171c26;
+        --fg: #f4f1ea;
+        --muted: #b9c0cc;
+        --quiet: #7e8796;
+        --line: #2b3343;
+        --accent: #ff4d2e;
+        --green: #35d08a;
+        --amber: #f7b731;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "Space Grotesk", Arial, sans-serif;
+      }
+
+      #main {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+
+      .backing {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 70% 30%, rgba(255, 77, 46, 0.2), rgba(8, 11, 16, 0) 35%),
+          radial-gradient(circle at 20% 80%, rgba(53, 208, 138, 0.16), rgba(8, 11, 16, 0) 36%),
+          var(--bg);
+      }
+
+      .grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.11;
+        background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 5px);
+        mix-blend-mode: screen;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        padding: 66px 76px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) 610px;
+        gap: 40px;
+      }
+
+      .stage {
+        position: relative;
+        align-self: start;
+        aspect-ratio: 16 / 9;
+        border: 2px solid var(--line);
+        border-radius: 18px;
+        background: rgba(16, 20, 28, 0.78);
+        overflow: hidden;
+        box-shadow: 0 35px 120px rgba(0, 0, 0, 0.42);
+      }
+
+      .asset {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        opacity: 0.9;
+        filter: saturate(0.92) contrast(1.03);
+      }
+
+      .asset-shade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(8, 11, 16, 0.14), rgba(8, 11, 16, 0) 48%, rgba(8, 11, 16, 0.45));
+      }
+
+      .scan {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 180px;
+        left: -220px;
+        background: linear-gradient(90deg, transparent, rgba(53, 208, 138, 0.24), transparent);
+        filter: blur(1px);
+      }
+
+      .target {
+        position: absolute;
+        border: 4px solid var(--accent);
+        border-radius: 13px;
+        box-shadow: 0 0 46px rgba(255, 77, 46, 0.32);
+        opacity: 0;
+      }
+
+      .target.control {
+        left: 165px;
+        top: 277px;
+        width: 442px;
+        height: 68px;
+      }
+
+      .target.workflow {
+        left: 34px;
+        top: 184px;
+        width: 622px;
+        height: 74px;
+        border-color: var(--green);
+        box-shadow: 0 0 46px rgba(53, 208, 138, 0.28);
+      }
+
+      .target.skills {
+        left: 34px;
+        top: 508px;
+        width: 644px;
+        height: 88px;
+        border-color: var(--amber);
+        box-shadow: 0 0 46px rgba(247, 183, 49, 0.22);
+      }
+
+      .rail {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-width: 0;
+      }
+
+      .eyebrow {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: var(--green);
+        font-size: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 58px;
+        line-height: 0.98;
+        letter-spacing: 0.01em;
+        font-weight: 900;
+      }
+
+      .lede {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 25px;
+        line-height: 1.24;
+        font-weight: 420;
+      }
+
+      .callout {
+        position: relative;
+        min-height: 132px;
+        padding: 18px 22px 18px;
+        border: 2px solid var(--line);
+        border-radius: 16px;
+        background: rgba(23, 28, 38, 0.88);
+        overflow: hidden;
+      }
+
+      .callout::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: var(--accent);
+      }
+
+      .callout.green::before {
+        background: var(--green);
+      }
+
+      .callout.amber::before {
+        background: var(--amber);
+      }
+
+      .num {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: var(--quiet);
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      .callout-title {
+        font-size: 27px;
+        font-weight: 800;
+        line-height: 1.05;
+        margin-bottom: 9px;
+      }
+
+      .callout-copy {
+        color: var(--muted);
+        font-size: 20px;
+        line-height: 1.26;
+        font-weight: 420;
+      }
+
+      .footer {
+        margin-top: auto;
+        padding-top: 14px;
+        border-top: 2px solid var(--line);
+      }
+
+      .footer .label {
+        color: var(--quiet);
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 17px;
+        margin-bottom: 8px;
+      }
+
+      .footer .statement {
+        color: var(--fg);
+        font-size: 25px;
+        line-height: 1.18;
+        font-weight: 800;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main" data-composition-id="tech-explainer" data-width="1920" data-height="1080" data-start="0" data-duration="14">
+      <div class="backing" data-layout-ignore></div>
+      <div class="grain" data-layout-ignore></div>
+      <section class="content">
+        <div class="stage">
+          <img class="asset" src="assets/omni-presence-architecture-theme-02-dark-console.png" alt="Omni-presence architecture" data-layout-allow-overflow />
+          <div class="asset-shade" data-layout-ignore></div>
+          <div class="scan" data-layout-ignore></div>
+          <div class="target workflow" data-layout-ignore></div>
+          <div class="target control" data-layout-ignore></div>
+          <div class="target skills" data-layout-ignore></div>
+        </div>
+
+        <aside class="rail">
+          <div>
+            <div class="eyebrow">What is actually happening</div>
+            <h1>Existing agent, better hands.</h1>
+            <p class="lede">The repo is not another agent brain. It gives Codex reliable skills and CLI actions.</p>
+          </div>
+
+          <div class="callout green">
+            <div class="num">01 / CHANNELS</div>
+            <div class="callout-title">Voice and SMS carry the user handoff.</div>
+            <div class="callout-copy">Twilio handles the call. Sendblue handles the link, status updates, and tapback approval.</div>
+          </div>
+
+          <div class="callout">
+            <div class="num">02 / CONTROL PLANE</div>
+            <div class="callout-title">Codex decides what to run next.</div>
+            <div class="callout-copy">Natural language triggers the workflow. The CLI output stays machine-readable.</div>
+          </div>
+
+          <div class="callout amber">
+            <div class="num">03 / PERMISSION</div>
+            <div class="callout-title">Notion waits for a human signal.</div>
+            <div class="callout-copy">Gemini prepares the artifact, but the save only happens after Fred's thumbs-up.</div>
+          </div>
+
+          <div class="footer">
+            <div class="label">PRODUCT BOUNDARY</div>
+            <div class="statement">Do not build another brain unless you need one. Give your existing agent better hands.</div>
+          </div>
+        </aside>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      tl.fromTo(".backing", { opacity: 0.75, scale: 1 }, { opacity: 1, scale: 1.03, duration: 14, ease: "sine.inOut" }, 0);
+      tl.fromTo(".stage", { x: -80, opacity: 0, scale: 0.96, filter: "blur(14px)" }, { x: 0, opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" }, 0.2);
+      tl.fromTo(".asset", { scale: 1.035 }, { scale: 1.005, duration: 13, ease: "sine.inOut" }, 0.6);
+      tl.fromTo(".eyebrow", { x: 42, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 0.55);
+      tl.fromTo("h1", { y: 44, opacity: 0 }, { y: 0, opacity: 1, duration: 0.62, ease: "expo.out" }, 0.82);
+      tl.fromTo(".lede", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.48, ease: "power2.out" }, 1.28);
+      tl.fromTo(".scan", { x: 0, opacity: 0 }, { x: 1380, opacity: 1, duration: 1.55, ease: "power2.inOut" }, 1.55);
+      tl.to(".scan", { opacity: 0, duration: 0.32, ease: "power2.out" }, 3.15);
+      tl.fromTo(".callout", { x: 58, opacity: 0, scale: 0.98 }, { x: 0, opacity: 1, scale: 1, duration: 0.55, stagger: 0.42, ease: "power4.out" }, 2.1);
+      tl.fromTo(".target.workflow", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.32, ease: "power2.out" }, 2.35);
+      tl.to(".target.workflow", { opacity: 0, duration: 0.5, ease: "power2.in" }, 4.3);
+      tl.fromTo(".target.control", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.32, ease: "power2.out" }, 4.25);
+      tl.to(".target.control", { opacity: 0, duration: 0.5, ease: "power2.in" }, 6.4);
+      tl.fromTo(".target.skills", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.32, ease: "power2.out" }, 6.25);
+      tl.to(".target.skills", { opacity: 0.62, duration: 0.5, ease: "power2.in" }, 8.8);
+      tl.fromTo(".footer", { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 8.7);
+      tl.fromTo(".callout", { y: 0 }, { y: -7, duration: 1.7, repeat: 2, yoyo: true, stagger: 0.08, ease: "sine.inOut" }, 9.5);
+      tl.to(".content", { opacity: 0, duration: 0.5, ease: "power2.in" }, 13.45);
+      tl.to(".backing, .grain", { opacity: 0, duration: 0.5, ease: "power2.in" }, 13.45);
+      window.__timelines["tech-explainer"] = tl;
+    </script>
+  </body>
+</html>

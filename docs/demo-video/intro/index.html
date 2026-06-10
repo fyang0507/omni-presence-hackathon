@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-300.ttf") format("truetype");
+        font-weight: 300;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-400.ttf") format("truetype");
+        font-weight: 400;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-500.ttf") format("truetype");
+        font-weight: 500;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-700.ttf") format("truetype");
+        font-weight: 700 900;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("fonts/ibm-plex-mono-600.ttf") format("truetype");
+        font-weight: 600;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("fonts/ibm-plex-mono-700.ttf") format("truetype");
+        font-weight: 700;
+      }
+
+      :root {
+        --bg: #080b10;
+        --panel: #10141c;
+        --panel-2: #171c26;
+        --fg: #f4f1ea;
+        --muted: #b9c0cc;
+        --quiet: #7e8796;
+        --line: #2b3343;
+        --accent: #ff4d2e;
+        --green: #35d08a;
+        --amber: #f7b731;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "Space Grotesk", Arial, sans-serif;
+      }
+
+      #main {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+
+      .glow {
+        position: absolute;
+        width: 760px;
+        height: 760px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 77, 46, 0.34), rgba(255, 77, 46, 0) 68%);
+        left: -210px;
+        top: -190px;
+        opacity: 0.9;
+      }
+
+      .glow.green {
+        width: 620px;
+        height: 620px;
+        left: 1430px;
+        top: 590px;
+        background: radial-gradient(circle, rgba(53, 208, 138, 0.24), rgba(53, 208, 138, 0) 70%);
+      }
+
+      .grid {
+        position: absolute;
+        inset: 0;
+        opacity: 0.18;
+        background-image: linear-gradient(rgba(244, 241, 234, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(244, 241, 234, 0.08) 1px, transparent 1px);
+        background-size: 72px 72px;
+        mask-image: radial-gradient(circle at 50% 46%, black, transparent 72%);
+      }
+
+      .grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.12;
+        background-image: repeating-radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 4px);
+        mix-blend-mode: screen;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        padding: 92px 104px 84px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: var(--quiet);
+        font-size: 21px;
+        letter-spacing: 0.03em;
+      }
+
+      .status-dot {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        margin-right: 12px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 24px rgba(53, 208, 138, 0.7);
+      }
+
+      .hero-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 68px;
+        align-items: center;
+      }
+
+      .copy {
+        min-width: 0;
+      }
+
+      .kicker {
+        color: var(--accent);
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 28px;
+        text-transform: uppercase;
+      }
+
+      .headline {
+        max-width: 860px;
+        font-size: 118px;
+        line-height: 0.93;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+        margin: 0;
+      }
+
+      .headline .muted {
+        color: var(--muted);
+      }
+
+      .subhead {
+        max-width: 760px;
+        margin: 34px 0 0;
+        color: var(--muted);
+        font-size: 37px;
+        line-height: 1.22;
+        font-weight: 450;
+      }
+
+      .textbox-wrap {
+        position: relative;
+        min-height: 590px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .textbox {
+        width: 760px;
+        min-height: 360px;
+        border: 3px solid var(--line);
+        border-radius: 20px;
+        background: rgba(16, 20, 28, 0.86);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.36);
+        padding: 42px;
+      }
+
+      .prompt {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 40px;
+        color: var(--fg);
+      }
+
+      .cursor {
+        display: inline-block;
+        width: 20px;
+        height: 42px;
+        margin-left: 8px;
+        vertical-align: -8px;
+        background: var(--accent);
+      }
+
+      .bubble {
+        margin-top: 48px;
+        border: 2px solid rgba(244, 241, 234, 0.18);
+        border-radius: 16px;
+        padding: 32px;
+        color: var(--muted);
+        font-size: 32px;
+        line-height: 1.25;
+      }
+
+      .channels {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .channel {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        background: rgba(23, 28, 38, 0.92);
+        color: var(--fg);
+        font-size: 28px;
+        font-weight: 700;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+      }
+
+      .channel::before {
+        content: "";
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 24px rgba(255, 77, 46, 0.55);
+      }
+
+      .channel.green::before {
+        background: var(--green);
+        box-shadow: 0 0 24px rgba(53, 208, 138, 0.6);
+      }
+
+      .channel.amber::before {
+        background: var(--amber);
+        box-shadow: 0 0 24px rgba(247, 183, 49, 0.58);
+      }
+
+      .voice {
+        left: 10px;
+        top: 56px;
+      }
+
+      .sms {
+        right: 8px;
+        top: 72px;
+      }
+
+      .notion {
+        right: 42px;
+        bottom: 56px;
+      }
+
+      .browser {
+        left: 26px;
+        bottom: 60px;
+      }
+
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 2px solid var(--line);
+        padding-top: 30px;
+      }
+
+      .punchline {
+        font-size: 34px;
+        font-weight: 800;
+        color: var(--fg);
+      }
+
+      .punchline span {
+        color: var(--accent);
+      }
+
+      .meta {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: var(--quiet);
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main" data-composition-id="intro" data-width="1920" data-height="1080" data-start="0" data-duration="8">
+      <div class="glow" data-layout-ignore></div>
+      <div class="glow green" data-layout-ignore></div>
+      <div class="grid" data-layout-ignore></div>
+      <div class="grain" data-layout-ignore></div>
+
+      <section class="content">
+        <div class="topbar">
+          <div><span class="status-dot"></span>OMNI-PRESENCE AGENT DEMO</div>
+          <div>CODEX / CLAUDE CODE AS CONTROL PLANE</div>
+        </div>
+
+        <div class="hero-row">
+          <div class="copy">
+            <div class="kicker">Pattern interrupt</div>
+            <h1 class="headline">The agent leaves the <span class="muted">chat box</span>.</h1>
+            <p class="subhead">Codex coordinates voice, SMS, approval, and workspace tools from one natural-language trigger.</p>
+          </div>
+
+          <div class="textbox-wrap">
+            <div class="textbox">
+              <div class="prompt">$ /demo<span class="cursor"></span></div>
+              <div class="bubble">Call Fred. Watch for the YouTube link. Ask before saving.</div>
+            </div>
+            <div class="channels">
+              <div class="channel voice">Voice</div>
+              <div class="channel green sms">SMS</div>
+              <div class="channel amber notion">Notion</div>
+              <div class="channel browser">Browser</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <div class="punchline">Do not let your agent sit in a <span>textbox</span>.</div>
+          <div class="meta">voice -> sms -> tapback -> notion</div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      tl.fromTo(".glow", { scale: 0.9, opacity: 0.5 }, { scale: 1.08, opacity: 0.9, duration: 8, ease: "sine.inOut" }, 0);
+      tl.fromTo(".grid", { opacity: 0.05, x: -18 }, { opacity: 0.18, x: 18, duration: 8, ease: "sine.inOut" }, 0);
+      tl.fromTo(".topbar", { y: -34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 0.15);
+      tl.fromTo(".kicker", { x: -44, opacity: 0 }, { x: 0, opacity: 1, duration: 0.48, ease: "power2.out" }, 0.55);
+      tl.fromTo(".headline", { y: 72, opacity: 0, scale: 0.98 }, { y: 0, opacity: 1, scale: 1, duration: 0.74, ease: "expo.out" }, 0.82);
+      tl.fromTo(".subhead", { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power4.out" }, 1.38);
+      tl.fromTo(".textbox", { x: 80, opacity: 0, scale: 0.94 }, { x: 0, opacity: 1, scale: 1, duration: 0.68, ease: "back.out(1.3)" }, 1.05);
+      tl.fromTo(".prompt", { opacity: 0, x: -26 }, { opacity: 1, x: 0, duration: 0.38, ease: "power2.out" }, 1.65);
+      tl.fromTo(".bubble", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 2.08);
+      tl.fromTo(".channel", { opacity: 0, scale: 0.72 }, { opacity: 1, scale: 1, duration: 0.44, stagger: 0.13, ease: "back.out(1.7)" }, 2.42);
+      tl.fromTo(".footer", { y: 42, opacity: 0 }, { y: 0, opacity: 1, duration: 0.58, ease: "power2.out" }, 3.25);
+      tl.fromTo(".cursor", { opacity: 1 }, { opacity: 0.15, duration: 0.5, repeat: 7, yoyo: true, ease: "steps(1)" }, 1.8);
+      tl.fromTo(".channel", { y: 0 }, { y: -8, duration: 1.4, repeat: 3, yoyo: true, stagger: 0.08, ease: "sine.inOut" }, 3.35);
+      tl.to(".content", { opacity: 0, duration: 0.45, ease: "power2.in" }, 7.45);
+      tl.to(".glow, .grid, .grain", { opacity: 0, duration: 0.45, ease: "power2.in" }, 7.45);
+      window.__timelines["intro"] = tl;
+    </script>
+  </body>
+</html>

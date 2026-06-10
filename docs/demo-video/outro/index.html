@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-300.ttf") format("truetype");
+        font-weight: 300;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-400.ttf") format("truetype");
+        font-weight: 400;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-500.ttf") format("truetype");
+        font-weight: 500;
+      }
+
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("fonts/space-grotesk-700.ttf") format("truetype");
+        font-weight: 700 900;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("fonts/ibm-plex-mono-600.ttf") format("truetype");
+        font-weight: 600;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("fonts/ibm-plex-mono-700.ttf") format("truetype");
+        font-weight: 700;
+      }
+
+      :root {
+        --bg: #080b10;
+        --panel: #10141c;
+        --panel-2: #171c26;
+        --fg: #f4f1ea;
+        --muted: #b9c0cc;
+        --quiet: #7e8796;
+        --line: #2b3343;
+        --accent: #ff4d2e;
+        --green: #35d08a;
+        --amber: #f7b731;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "Space Grotesk", Arial, sans-serif;
+      }
+
+      #main {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+
+      .glow {
+        position: absolute;
+        width: 980px;
+        height: 980px;
+        border-radius: 50%;
+        left: 470px;
+        top: 70px;
+        background: radial-gradient(circle, rgba(255, 77, 46, 0.23), rgba(255, 77, 46, 0) 62%);
+      }
+
+      .map {
+        position: absolute;
+        inset: 0;
+        opacity: 0.32;
+      }
+
+      .map-line {
+        position: absolute;
+        height: 2px;
+        width: 560px;
+        background: var(--line);
+        transform-origin: left center;
+      }
+
+      .line-a {
+        left: 680px;
+        top: 360px;
+        transform: rotate(-23deg);
+      }
+
+      .line-b {
+        left: 690px;
+        top: 518px;
+        transform: rotate(0deg);
+      }
+
+      .line-c {
+        left: 680px;
+        top: 675px;
+        transform: rotate(24deg);
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        padding: 86px 104px 78px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: var(--quiet);
+        font-size: 21px;
+      }
+
+      .center {
+        display: grid;
+        grid-template-columns: 840px minmax(0, 1fr);
+        align-items: center;
+        gap: 54px;
+      }
+
+      .prompt-card {
+        width: 690px;
+        min-height: 390px;
+        border: 3px solid var(--line);
+        border-radius: 20px;
+        background: rgba(16, 20, 28, 0.9);
+        padding: 38px;
+        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.38);
+      }
+
+      .prompt-label {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: var(--quiet);
+        font-size: 22px;
+        margin-bottom: 76px;
+      }
+
+      .prompt-small {
+        display: inline-flex;
+        padding: 18px 22px;
+        border-radius: 999px;
+        background: rgba(255, 77, 46, 0.12);
+        border: 2px solid rgba(255, 77, 46, 0.44);
+        color: var(--accent);
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 30px;
+        font-weight: 700;
+      }
+
+      .nodes {
+        position: relative;
+        width: 840px;
+        min-height: 560px;
+      }
+
+      .node {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 180px;
+        padding: 22px 26px;
+        border-radius: 999px;
+        border: 2px solid var(--line);
+        background: rgba(23, 28, 38, 0.93);
+        color: var(--fg);
+        font-size: 29px;
+        font-weight: 800;
+        box-shadow: 0 20px 70px rgba(0, 0, 0, 0.32);
+      }
+
+      .agent {
+        left: 82px;
+        top: 218px;
+        min-width: 260px;
+        color: var(--bg);
+        background: var(--fg);
+        border-color: var(--fg);
+      }
+
+      .phone {
+        left: 508px;
+        top: 62px;
+      }
+
+      .sms {
+        left: 590px;
+        top: 222px;
+        border-color: rgba(53, 208, 138, 0.62);
+      }
+
+      .repo {
+        left: 508px;
+        top: 388px;
+      }
+
+      .notion {
+        left: 610px;
+        top: 302px;
+        border-color: rgba(247, 183, 49, 0.72);
+      }
+
+      .copy {
+        max-width: 940px;
+      }
+
+      .kicker {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: var(--green);
+        font-size: 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 100px;
+        line-height: 0.97;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+      }
+
+      h1 span {
+        color: var(--accent);
+      }
+
+      .subline {
+        margin-top: 34px;
+        color: var(--muted);
+        font-size: 34px;
+        line-height: 1.25;
+        font-weight: 420;
+        max-width: 790px;
+      }
+
+      .bottom {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        border-top: 2px solid var(--line);
+        padding-top: 28px;
+      }
+
+      .role {
+        font-size: 30px;
+        font-weight: 800;
+      }
+
+      .role span {
+        color: var(--quiet);
+        font-weight: 500;
+      }
+
+      .tag {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: var(--quiet);
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main" data-composition-id="outro" data-width="1920" data-height="1080" data-start="0" data-duration="8">
+      <div class="glow" data-layout-ignore></div>
+      <div class="map" data-layout-ignore>
+        <div class="map-line line-a"></div>
+        <div class="map-line line-b"></div>
+        <div class="map-line line-c"></div>
+      </div>
+
+      <section class="content">
+        <div class="top">
+          <div>OMNI-PRESENCE AGENT DEMO</div>
+          <div>FINAL THESIS</div>
+        </div>
+
+        <div class="center">
+          <div class="nodes">
+            <div class="prompt-card">
+              <div class="prompt-label">single chat box</div>
+              <div class="prompt-small">$ /demo</div>
+            </div>
+            <div class="node agent">Agent</div>
+            <div class="node phone">Phone</div>
+            <div class="node sms">SMS</div>
+            <div class="node repo">Repo</div>
+            <div class="node notion">Notion</div>
+          </div>
+
+          <div class="copy">
+            <div class="kicker">The punchline</div>
+            <h1>Do not let your agent sit in a <span>textbox</span>.</h1>
+            <div class="subline">It should meet you wherever you are: phone, text, browser, repo, and workspace.</div>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <div class="role">Fred Yang <span>/ Applied AI Engineer</span></div>
+          <div class="tag">agent skills + CLI primitives + human approval loops</div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      tl.fromTo(".glow", { scale: 0.85, opacity: 0.55 }, { scale: 1.08, opacity: 0.92, duration: 8, ease: "sine.inOut" }, 0);
+      tl.fromTo(".top", { y: -28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.16);
+      tl.fromTo(".prompt-card", { x: -58, opacity: 0, scale: 0.96 }, { x: 0, opacity: 1, scale: 1, duration: 0.62, ease: "expo.out" }, 0.48);
+      tl.fromTo(".map-line", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.7, stagger: 0.12, ease: "power3.out" }, 1.05);
+      tl.fromTo(".node", { opacity: 0, scale: 0.72 }, { opacity: 1, scale: 1, duration: 0.46, stagger: 0.12, ease: "back.out(1.7)" }, 1.28);
+      tl.fromTo(".kicker", { x: 42, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power2.out" }, 1.85);
+      tl.fromTo("h1", { y: 70, opacity: 0, scale: 0.98 }, { y: 0, opacity: 1, scale: 1, duration: 0.78, ease: "expo.out" }, 2.15);
+      tl.fromTo(".subline", { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.56, ease: "power3.out" }, 2.88);
+      tl.fromTo(".bottom", { y: 38, opacity: 0 }, { y: 0, opacity: 1, duration: 0.58, ease: "power2.out" }, 3.55);
+      tl.fromTo(".node", { y: 0 }, { y: -9, duration: 1.2, repeat: 3, yoyo: true, stagger: 0.06, ease: "sine.inOut" }, 3.7);
+      tl.to(".content", { opacity: 0, duration: 0.45, ease: "power2.in" }, 7.45);
+      tl.to(".glow, .map", { opacity: 0, duration: 0.45, ease: "power2.in" }, 7.45);
+      window.__timelines["outro"] = tl;
+    </script>
+  </body>
+</html>
